@@ -21,11 +21,9 @@ String.prototype.toTitleCase = function () {
   });
 };
 
-// Create the player array, select the number of players, and assign them each names.
-// They are all given empty hand[] placeholders for use later.
 var players = [];
 var numPlayers = prompt('How many human players? (1-5)? ');
-    while (isNaN(numPlayers) || numPlayers < 1 || numPlayers > 5) {
+    while (numPlayers < 0 || numPlayers > 5) {
     	numPlayers = prompt('Please enter a numeric value between 1 and 5: ');
 	}
 
@@ -35,8 +33,7 @@ for (i=1; i <= numPlayers; i++) {
 	players.push({'name': tmpName, 'hand': []});
 }
 
-// List the names of the players.  More of an error checking code to ensure the array
-// was set up properly.
+// List the names of the players:
 
 function listPlayers() {
 	string = '';
@@ -52,14 +49,10 @@ function listPlayers() {
 
 listPlayers();
 
-// Define what is in a deck of cards:
-var suits = ['\u2660','\u2663','\u2665','\u2666'];
-var ranks = ['A',2,3,4,5,6,7,8,9,10,'J','Q','K'];
 
-// Card Constructor.  Uses a suit and rank parameter.
-function Card(rank, suit) {
-    rank = ranks[index];
-    suit = suits[index];
+
+// Card Constructor
+function Card(suit, rank) {
     this.getValue = function(){
         if (rank===1){
             return 11;
@@ -77,19 +70,21 @@ function Card(rank, suit) {
     };    
 }
 
-// This creates the deck using the Card constructor (assigning 4*13
-// cards unique values based on what suits and ranks contain.)
-var deck = [];
-for (var i=0; i<suits.length; i++) {
-    for (var j=0; j<ranks.length; j++) {
-        deck.push(new Card({'rank': ranks[j], 'suit':suits[i]}));
-    }
-}
 
-// This will shuffle the deck and ensure they are all stacked
-// together by resetting topCard to 0.
+
+//This will shuffle the deck and ensure they are all stacked together (topCard = 0)
 deck.sort(function() {return 0.5 - Math.random()});
 var topCard = 0;
+
+//Deal 2 cards to each player and the dealer (computer) in order.
+function deal() {
+	for (i=0; i<2; i++) {
+    	for (j=0; j < players.length; j++) {
+        	players[j].hand.push(deck[topCard]);
+        	topCard++;
+        }
+    }
+}
 
 // This is the Hand Constructor
 function Hand(){
@@ -136,44 +131,59 @@ function Hand(){
     }
 }
 
-// Deal 2 cards to each player and a single card to the computer
-// after the first set has been dealt.
-// Each player (except the dealer) receives their second card
-// after the first series. 
 
-function deal() {
-    var dealer = false;
-    for (j=1; j < players.length; j++) {
-        for (i=0; i<2; i++) {
-            var card = deck[topCard];
-            players[j].hand.push(card);
-            topCard++;
-            // The dealer is hard coded to player 0
-            if (j === (players.length-1) && dealer) {
-                players[0].hand.push(card);
-                dealer = true;
-                topCard++;
-            }
+
+function playAsUser() { 
+    var userHand = new Hand();
+    var decision = false;
+    do { 
+        decision = confirm("Your hand is "+ userHand.printHand() + " \rYour current score is " + userHand.score() + ".\r\rOK to hit or Cancel to stand");
+        if (decision === true) {
+        	userHand.hitMe();	
+        } else {
+        	break;
         }
+    } while(decision && userHand.score() <=21)  
+    return userHand;     
+}; 
+
+var playAsDealer = function() {
+    var dealerHand = new Hand();
+    while (dealerHand.score() < 17) {
+        dealerHand.hitMe();
+    }
+    return dealerHand;
+}
+
+function declareWinner(player,computer) {
+    var userScore = player.score();
+    var dealerScore = computer.score();
+    
+    if (userScore > 21) {
+        if (dealerScore > 21) {
+            return "You tied!" /*\r\rYour score: " + userScore + "\rComputer: " + dealerScore*/;
+        } else {
+            return "You lose!" /*\r\rYour score: " + userScore + "\rComputer: " + dealerScore*/;
+        }
+    } else if (dealerScore > 21) {
+    /*    if (userScore === 21) {
+            return "Blackjack! You win! \r\rYour score: " + userScore + "\rComputer: " + dealerScore;
+        } else {   */
+            return "You win!" /*\r\rYour score: " + userScore + "\rComputer: " + dealerScore*/;
+     /*   } */
+    } else if (userScore === dealerScore) {    
+        return "You tied!" /*\r\rYour score: " + userScore + "\rComputer: " + dealerScore*/;
+    } else {
+        return "You lose!" /*\r\rYour score: " + userScore + "\rComputer: " + dealerScore*/;
     }
 }
 
-deal();
-
-// Show those two cards to each player
-// Do not show the dealers hand.
-
-function showAllHands() {
-    for (i=1; i < players.length; i++) {
-        showHand(i);
-    }
-}
-
+// Show the hand of the player with the selected parameter. 
 function showHand(player) {
     thishand = '';
     num = player;
     // If num isNaN, forces the user to select something else.
-    if (isNaN(player) || (num < 1 || num > players.length)) {
+    if (isNaN(player) || (num < 0 || num > players.length)) {
        	num = prompt('That was not a valid number. \r\rPlease enter a player number between 1 and ' + players.length-1 + ' or choose 0 for the dealer hand.'); 
    		if (false) {
    			return -1;
@@ -191,15 +201,11 @@ function showHand(player) {
 	console.log(thishand);    
 }
 
-showAllHands()
+// Play the game
+function playGame() {
+    player = playAsUser();
+    computer = playAsDealer();
+    console.log(declareWinner(player,computer) + " \n\nYour score: " + player.score() + '\n\n' + playAsUser.printHand() + "\nComputer: " + computer.score() + '\n\n');
+}
 
-// Manually scripted version of showing Player 1's hand
-player[1]
-
-// Player 1-5 goes first, dealer goes last.  Player 1-5
-// can choose whether to hit or stand each time their
-// turn comes, and the dealer must adhere to blackjack
-// rules.
-
-
-// If a player busts while hitting 
+playGame();
