@@ -29,42 +29,15 @@ String.prototype.toTitleCase = function () {
 
 // Show the hand of the player with the selected parameter. 
 function showHand(player) {
-    thishand = 'this is the hand (you shouldn\'t see this)';
+    thishand = 'thishand - should be invisible';
     num = player;
-    // Fixes the proper captialization of player.
-    if (isNaN(player)) {
-    	player.toTitleCase;
+    // If num isNaN, forces the user to select something else.
+    if (isNaN(player) || (num < 0 || num > players.length)) {
+   		num = prompt('Please enter a player number between 1 and ' + players.length + ' or choose 0 for the dealer hand.'); 
+   		if (false) {
+   			return -1;
+   		}   		
     }
-    // Validates the parameter using a do/while (executing the code 
-    // and repeating if the condition is not met).
-    do {
-    	// Determines if the parameter was text or a number
-	    if (isNaN(num)) {
-	    	var tmpName = ''
-	    	for (i=0; i < players.length; i++) {
-		    	var tmpName = players[i];
-		    	tmpName.toTitleCase();	
-				// If there is a match found exit the loop
-				if (player === tmpName) {
-		    		num = i;
-					break;
-				}
-			}
-		// If the player not a number, the program checks to see if none of the 
-		// players[i].name attributes match and executes this block if none do.
-		} else if ( player !== player[i].name) {
-			string = '';		
-			for (i=0; i < players.length-1; i++) {
-				string += players[i].name + ', ';
-			}
-			{
-				string += 'or ' + players[i].name + '.'
-			}
-
-			player = prompt('You didn\'t enter a valid player name. Select one of the following players: \r' + string);
-		// If the player is a valid name then run the following code:
-		}
-    } while (!isNaN(num));
     console.log('Hand belonging to ' + players[num].name + ': ');
  		       
 	for (j=0; j < players[num].hand.length-1; j++) {

@@ -68,29 +68,29 @@ function showAllHands() {
     }
 }
 
-// Shows a specific hand for a player based on name or number
-
+// Show the hand of the player with the selected parameter (must be a number). 
 function showHand(player) {
     thishand = '';
     num = player;
-    
-    while (isNaN(player)) {
-        string = '';
-        for (i=0; i < players.length; i++) {
-            string += players[i] + ' for ' + players[i].name + '\r';
-        }
-        num = prompt('Enter a player number. \r' + string);
+    // If num isNaN, forces the user to select something else.
+    if (isNaN(player) || (num < 0 || num > players.length)) {
+           num = prompt('That was not a valid number. \r\rPlease enter a player number between 1 and ' + players.length-1 + ' or choose 0 for the dealer hand.'); 
+   		if (false) {
+   			return -1;
+   		}   		
     }
-
     console.log('Hand belonging to ' + players[num].name + ': ');
     
-    for (j=0; j < players[num].hand.length-1; j++) {
-    	thishand += players[num].hand[j].rank + players[num].hand[j].suit + ', ';			
-    	}
-    	{
-    		thishand += players[num].hand[j].rank + players[num].hand[j].suit + '.';			
-    	}
-    console.log(thishand);
+    //Displays all the cards in the hand.
+	for (j=0; j < players[num].hand.length-1; j++) {
+		thishand += players[num].hand[j].rank + players[num].hand[j].suit + ', ';			
+		}
+		{
+		thishand += players[num].hand[j].rank + players[num].hand[j].suit + '.';			
+		}
+	console.log(thishand);    
 }
 
 showAllHands();
+
+showHand(2);
